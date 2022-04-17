@@ -1,0 +1,124 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+.sentiment {
+  margin: auto;
+  width: 50%;
+  height: 400px;
+  border: 1px solid rgb(0, 159, 239);
+  border-radius: 5px;
+  box-shadow: 0 0 2px 0 rgba(101, 151, 188, 0.2), 0 10px 30px 0 rgba(111, 162, 201, 0.2);
+  background-color: rgb(244, 241, 241);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.sentiment > div {
+  border: 1px rgb(141, 235, 210) solid;
+  text-align: center;
+
+  margin: 1px;  /* and that, will result in a 10px gap */
+}
+
+
+.sentiment-form {
+  display: flex;
+  flex-direction: row;
+  flex: 2 1 0;
+  padding: 2px;
+}
+
+.sentiment-options {
+  display: flex;
+  flex-direction: row;
+}
+
+.sentiment-result {
+  flex: 2 1 0;
+}
+
+/* CSS */
+.sentiment-button button {
+  background-color: #c2fbd7;
+  border-radius: 100px;
+  box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset,rgba(44, 187, 99, .15) 0 1px 2px,rgba(44, 187, 99, .15) 0 2px 4px,rgba(44, 187, 99, .15) 0 4px 8px,rgba(44, 187, 99, .15) 0 8px 16px,rgba(44, 187, 99, .15) 0 16px 32px;
+  color: green;
+  cursor: pointer;
+  float: right;
+  font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
+  padding: 7px 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 250ms;
+  border: 0;
+  font-size: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.submit-button button:hover {
+  box-shadow: rgba(44,187,99,.35) 0 -25px 18px -14px inset,rgba(44,187,99,.25) 0 1px 2px,rgba(44,187,99,.25) 0 2px 4px,rgba(44,187,99,.25) 0 4px 8px,rgba(44,187,99,.25) 0 8px 16px,rgba(44,187,99,.25) 0 16px 32px;
+  transform: scale(1.05) rotate(-1deg);
+}
+
+#text {
+  min-width: 350px;
+  min-height: 200px;
+  max-width: 350px;
+  max-height: 200px;
+}
+
+label {
+  font-size: 24px;
+  color: rgb(36, 182, 131);
+}
+
+.greeting {
+  text-align: center;
+  font-family: Sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td{
+  padding: 10px;
+  border-bottom: 1px solid black;
+}
+
+#verdict {
+  font-size: 24px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+span{
+  display: block;
+	border: 1px solid;
+	margin: 5px;
+	padding:5px 10px 5px 40px;
+	background-repeat: no-repeat;
+	background-position: 10px center;
+	border-radius: 3px;
+}
+
+span.positive {
+  background-color: #36f57c;
+}
+
+span.neutral {
+  background-color: rgb(251, 248, 84);
+}
+
+span.negative {
+  background-color: rgb(223, 87, 87);
+}

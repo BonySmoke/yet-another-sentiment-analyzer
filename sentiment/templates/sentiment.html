@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    {% block content %}
+    <h1 class="greeting">Sentiment Analyser</h1>
+    <div class="sentiment">
+        <div class="sentiment-form">
+            <form action="/" method="post">
+                <div class="sentiment-options">
+                    <ul>
+                        <li>
+                            <label for="lang">Language:</label>
+                            <select name="lang" id="lang">
+                                {% for lang in data.languages %}
+                                <option value="{{ lang['value'] }}">{{ lang['title'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </li>
+                        <li>
+                            <label for="algorithm">Algorithm:</label>
+                            <select name="algorithm" id="algorithm">
+                                {% for algorithm in data.algorithms %}
+                                <option value="{{ algorithm['value'] }}">{{ algorithm['title'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </li>
+                        <li>
+                            <label for="clf_type">Classification Type</label>
+                            <select name="clf_type" id="clf_type">
+                                {% for clf_type in data.clf_types %}
+                                <option value="{{ clf_type['value'] }}">{{ clf_type['title'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </li>
+                        <li>
+                            <label for="explain">Explain?</label>
+                            <input type="checkbox" id="explain" name="explain">
+                        </li>
+                    </ul>
+                    <div class="sentiment-text">
+                        <textarea id="text" name="text", placeholder="Text to analyse" required></textarea>
+                    </div>
+                </div>
+                <div class="sentiment-button">
+                    <button type="submit">Analyse</button>
+                </div>
+            </form>
+        </div>
+        <div class="sentiment-result">
+            <h1> Results</h1>
+            {% if data.sentiment %}
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Tag</td>
+                        <td>Probability</td>
+                    </tr>
+                    {% for class, proba in data.sentiment.probability_scores.items() %}
+                    <tr>
+                        <td>{{class}}</td>
+                        <td>{{proba}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <p id="verdict">Your text sounds
+                    {% if data.sentiment.tag == ("Positive" or "Very positive") %}
+                    <span class="positive">{{ data.sentiment.tag }}</span>
+                    {% elif data.sentiment.tag == ("Negative" or "Very negative") %}
+                    <span class="negative">{{ data.sentiment.tag }}</span>
+                    {% else %}
+                    <span class="neutral">{{ data.sentiment.tag }}</span>
+                    {% endif %}
+                </p>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+    {% if data.explain %}
+    <div class="explanation">
+        <iframe src="{{ url_for('static', filename='analysis.html') }}" title="Explanation" height="300" width="1200"></iframe>
+    </div>
+    {% endif %}
+    {% endblock %}
+</body>
+</html>
