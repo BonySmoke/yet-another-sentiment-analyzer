@@ -137,24 +137,24 @@ class Analizer:
 
     @staticmethod
     def _define_sentiment_type(rate):
-        if rate > 3:
-            return "Positive"
-        if rate == 3:
-            return "Neutral"
-        if rate < 3:
-            return "Negative"
-        # if rate == 5: return "Very positive"
-        # if rate == 4: return "Positive"
-        # if rate == 3: return "Somewhat Neutral"
-        # if rate == 2: return "Negative"
-        # if rate == 1: return "Very negative"
+        # if rate > 3:
+        #     return "Positive"
+        # if rate == 3:
+        #     return "Neutral"
+        # if rate < 3:
+        #     return "Negative"
+        if rate == 5: return "Very positive"
+        if rate == 4: return "Positive"
+        if rate == 3: return "Somewhat Neutral"
+        if rate == 2: return "Negative"
+        if rate == 1: return "Very negative"
 
     def _set_review_weight(cls):
         '''
         Add sentiment column to the dataframe
         '''
         # remove neutral reviews
-        cls.data = cls.data[cls.data['overall'] != 3]
+        # cls.data = cls.data[cls.data['overall'] != 3]
         cls.data['sentiment'] = cls.data['overall'].apply(
             lambda rating: cls._define_sentiment_type(rating))
         # cls._balance_data() # adjust weights

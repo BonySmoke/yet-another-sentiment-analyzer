@@ -4,6 +4,7 @@ from textblob import TextBlob
 from pymorphy2 import MorphAnalyzer
 import re
 
+
 class TextPreprocessing:
 
     GARBAGE_TOKENS = "~`!@#$%^&*()_-+={[}]|\:;'<,>.?/"
@@ -36,12 +37,13 @@ class TextPreprocessing:
         # decrease the number of tokens to token_limit
         # TODO: TO BE RECONSIDERED AS IT IS TOO NAIVE
         if self.token_limit:
-            self.text_dict = {k:v for i, (k,v) in enumerate(self.text_dict.items())
-                                if i <= self.token_limit}
+            self.text_dict = {k: v for i, (k, v) in enumerate(self.text_dict.items())
+                              if i <= self.token_limit}
         return self.text_dict
 
     def _dict_to_text(self):
-        self.text = re.sub(' +', ' ', " ".join([t for t in self.tokens.values()]))
+        self.text = re.sub(
+            ' +', ' ', " ".join([t for t in self.tokens.values()]))
         return self.text
 
     def negate_pos(self, token: str) -> str:
@@ -101,19 +103,23 @@ class TextPreprocessing:
         """
         tokens = [str(t.text) for t in self._doc]
 
-        has_negation = next((True for token in self._doc if token.dep_ == 'neg'), False)
+        has_negation = next(
+            (True for token in self._doc if token.dep_ == 'neg'), False)
         if has_negation:
-            conj_ids = [token.i for token in self._doc if token.pos_ in self.CONJ_TYPES]
+            conj_ids = [
+                token.i for token in self._doc if token.pos_ in self.CONJ_TYPES]
             # if there is only one clause
             if not conj_ids:
                 for token in self.tokens:
                     if self._doc[token].pos_ in self.SENTIMENT_POS:
-                        self.tokens[token] = self.negate_pos(self._doc[token].text)
+                        self.tokens[token] = self.negate_pos(
+                            self._doc[token].text)
                 return self._dict_to_text()
 
             clauses = self.split_sents_to_clauses(self._doc, conj_ids)
             for clause in clauses:
-                is_negative_clause = [True for tkn in clause if tkn.dep_ == 'neg']
+                is_negative_clause = [
+                    True for tkn in clause if tkn.dep_ == 'neg']
                 if not is_negative_clause:
                     continue
 
@@ -126,7 +132,8 @@ class TextPreprocessing:
 
     def remove_garbage(self):
         self.text = self._dict_to_text()
-        self.text = "".join([char for char in self.text if char not in self.GARBAGE_TOKENS])
+        self.text = "".join(
+            [char for char in self.text if char not in self.GARBAGE_TOKENS])
         return self.text
 
     def remove_stop_words(self):
@@ -144,17 +151,17 @@ class TextPreprocessing:
         """
         for token in self.tokens.copy():
             if (self._doc[token].pos_ in self.SENTIMENT_POS
-                and not self.tokens[token].startswith(self.NEGATIVE_PREFIX)):
+                    and not self.tokens[token].startswith(self.NEGATIVE_PREFIX)):
 
                 word_polarity = TextBlob(self._doc[token].lemma_).polarity
                 if (self.expected_sentiment > 3
-                    and self.is_negative(word_polarity)):
+                        and self.is_negative(word_polarity)):
                     del self.tokens[token]
                 if (self.expected_sentiment == 3
-                    and self.is_not_neutral(word_polarity)):
+                        and self.is_not_neutral(word_polarity)):
                     del self.tokens[token]
                 if (self.expected_sentiment < 3
-                    and self.is_positive(word_polarity)):
+                        and self.is_positive(word_polarity)):
                     del self.tokens[token]
 
     @staticmethod
@@ -202,53 +209,86 @@ class TextPreprocessing:
 class UKTextPreprocessing:
 
     GARBAGE_TOKENS = "~`!@#$%^&*()_-+={[}]|\:;'<,>.?/"
+    SENTIMENT_POS = ['ADJF', 'VERB']
+    NEGATION_WORDS = ['ні', 'не']
+    NEGATIVE_PREFIX = 'не_'
 
     def __init__(self, text: str, morph_analyzer: MorphAnalyzer = None) -> None:
         self.text = text.lower()
-        self.analyzer = morph_analyzer if morph_analyzer else MorphAnalyzer(lang="uk")
+        self.analyzer = morph_analyzer if morph_analyzer else MorphAnalyzer(
+            lang="uk")
 
         self._construct_text_dict()
 
     def _construct_text_dict(cls):
         # remove garbage tokens
         cls.text = "".join([char for char in cls.text
-                        if char not in cls.GARBAGE_TOKENS])
+                            if char not in cls.GARBAGE_TOKENS])
+        cls.tokens = dict()
+        cls._doc = dict()
 
-        cls.tokens = cls.text.split()
+        words = cls.text.split()
+
+        for i, word in enumerate(words):
+            cls.tokens[i] = word
+            cls._doc[i] = cls.analyzer.parse(word)[0]
 
     def _to_text(cls):
-        return " ".join(cls.tokens)
+        return " ".join([t for t in cls.tokens.values()])
 
     def _load_ukrainian_stopwords(cls):
         with open("./data/ukrainian_stopwords.txt", "r", encoding="utf-8") as f:
             cls.stopwords = [word.strip() for word in f]
 
-    def lemmatize(self):
+    def lemmatize(self) -> str:
         """Get the normal form of each word
 
         Returns:
             tokens: normalized tokens
         """
         for i in range(len(self.tokens)):
-            parsed_token = self.analyzer.parse(self.tokens[i])
-            if not parsed_token:
-                continue
-            self.tokens[i] = parsed_token[0].normal_form
+            self.tokens[i] = self._doc[i].normal_form
 
+        return self._to_text()
+
+    def pos_tag(self) -> str:
+        for token in self.tokens:
+            self.tokens[token] += f'_{self._doc[token].tag.POS}'
         return self._to_text()
 
     def remove_stopwords(self):
         if not hasattr(self, 'stopwords'):
             self._load_ukrainian_stopwords()
 
-        self.tokens = [t for t in self.tokens
-                       if t not in self.stopwords]
-
+        for key, value in self.tokens.copy().items():
+            if value in self.stopwords:
+                del self.tokens[key]
         return self._to_text()
+
+    def negate_pos(self, token: str) -> str:
+        """Negate word by adding a prefix"""
+        return f'{self.NEGATIVE_PREFIX}{token}'
+
+    def negate_sequences(self) -> str:
+        '''
+        Negate text by splitting it into clauses
+        and negate using a heuristic approach
+        '''
+        has_negation = any(t for t in self.tokens
+                           if self.tokens[t] in self.NEGATION_WORDS)
+        if not has_negation:
+            return self._to_text()
+        for t in self.tokens:
+            if self._doc[t].tag.POS in self.SENTIMENT_POS:
+                self.tokens[t] = self.negate_pos(self.tokens[t])
+
+        return self._to_text
 
     def normalize(self):
 
         self.lemmatize()
+        self.negate_sequences()
         self.remove_stopwords()
+        self.pos_tag()
 
         return self._to_text()
