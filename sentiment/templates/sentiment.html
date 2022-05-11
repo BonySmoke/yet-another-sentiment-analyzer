@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
     <title>Sentiment</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 </head>
+
 <body>
     {% block content %}
     <h1 class="greeting">Sentiment Analyser</h1>
@@ -41,11 +43,16 @@
                         </li>
                         <li>
                             <label for="explain">Explain?</label>
+                            {% if data.explain %}
+                            <input type="checkbox" id="explain" name="explain" checked>
+                            {% else %}
                             <input type="checkbox" id="explain" name="explain">
+                            {% endif %}
                         </li>
                     </ul>
                     <div class="sentiment-text">
-                        <textarea id="text" name="text", placeholder="Text to analyse" required></textarea>
+                        <textarea id="text" name="text" , placeholder="Text to analyse"
+                            required>{{data.text}}</textarea>
                     </div>
                 </div>
                 <div class="sentiment-button">
@@ -84,9 +91,11 @@
     </div>
     {% if data.explain %}
     <div class="explanation">
-        <iframe src="{{ url_for('static', filename='analysis.html') }}" title="Explanation" height="300" width="1200"></iframe>
+        <iframe src="{{ url_for('static', filename='analysis.html') }}" title="Explanation" height="300"
+            width="1200"></iframe>
     </div>
     {% endif %}
     {% endblock %}
 </body>
+
 </html>

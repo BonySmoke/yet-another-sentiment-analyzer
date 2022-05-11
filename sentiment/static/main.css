@@ -122,3 +122,8 @@ span.neutral {
 span.negative {
   background-color: rgb(223, 87, 87);
 }
+
+.explanation {
+  margin: auto;
+  width: 70%;
+}
